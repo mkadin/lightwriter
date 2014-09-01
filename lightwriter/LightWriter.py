@@ -127,8 +127,9 @@ class LightWriter(object):
     def wait(self, seconds):
         time.sleep(seconds)
 
-    def frame_method(self, method, *args, **kwargs):
+    def frame_method(self, method, write, *args, **kwargs):
         """Call a frame method on the current frame."""
         self._frame_check(None)
         getattr(self._frame, method)(*args, **kwargs)
-        self.write_frame()
+        if write:
+            self.write_frame()
