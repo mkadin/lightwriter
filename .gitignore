@@ -1,0 +1,24 @@
+*.py[cod]
+*.orig
+
+# C extensions
+*.so
+
+# OS X Junk
+.DS_Store
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib64
+__pycache__
+env
