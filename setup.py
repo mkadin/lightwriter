@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='LightWriter',
-    version='1.0.1',
+    version='1.0.2',
     author='Mike Kadin',
     author_email='michaelkadin@gmail.com',
     packages=find_packages(),
