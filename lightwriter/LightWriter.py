@@ -94,7 +94,7 @@ class LightWriter(object):
             self.write_frame()
             time.sleep(interval)
 
-    def blink(self, color, length=5, interval=.3, frame=None):
+    def blink(self, color='white', length=5, interval=.3, frame=None):
         self._frame_check(frame)
         steps = int(length / interval / 2)
         for i in range(steps):
@@ -105,8 +105,27 @@ class LightWriter(object):
             self.write_frame()
             time.sleep(interval)
 
+    def rise_and_fall(self, color='red', height=10, length=5, interval=.3,
+                      background='blue', frame=None):
+        self._frame_check(frame)
+        stepper = 1
+        height_counter = 1
+        steps = int(length / interval)
+        for i in range(steps):
+            self._frame.set_color_by_name(background)
+            self._frame.set_height(color, height_counter)
+            self.write_frame()
+            height_counter += stepper
+            if height_counter == height or height_counter == 0:
+                stepper = stepper * -1
+
+            time.sleep(interval)
+
     def clear(self):
         self.write_frame(Frame())
+
+    def wait(self, seconds):
+        time.sleep(seconds)
 
     def frame_method(self, method, *args, **kwargs):
         """Call a frame method on the current frame."""

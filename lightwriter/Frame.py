@@ -55,6 +55,10 @@ class Frame(object):
         for i in range(10):
             self.set_color_by_rgb(nodes[i][0], nodes[i][1], nodes[i][2], node=i)
 
+    def set_height(self, color, height):
+        for i in range(height):
+            self.set_color_by_name(color, node=i)
+
     def _distribute_nodes(self, nodes):
         groups = []
         for i in range(len(nodes)):
