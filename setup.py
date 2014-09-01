@@ -10,6 +10,6 @@ setup(
     url='http://pypi.python.org/pypi/LightWriter/',
     license='LICENSE.txt',
     description='Control a RadioShack Light Strip with an Arduino and Python',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[req.strip() for req in open('requirements.txt').readlines()],
 )
