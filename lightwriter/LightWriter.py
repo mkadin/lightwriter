@@ -107,3 +107,8 @@ class LightWriter(object):
 
     def clear(self):
         self.write_frame(Frame())
+
+    def frame_method(self, method, *args, **kwargs):
+        """Call a frame method on the current frame."""
+        self._frame_check(None)
+        getattr(self._frame, method)(*args, **kwargs)
