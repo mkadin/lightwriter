@@ -19,13 +19,13 @@ class Frame(object):
         for i in nodes:
             self.data[i] = [0, r, b, g]
 
-    def set_brightness(self, percent, node=None):
+    def set_brightness(self, percent, allow_zero=False, node=None):
         factor = percent / 100.0
         nodes = [node] if node is not None else range(10)
         for i in nodes:
             for j in range(1, 4):
                 self.data[i][j] = int(factor * self.data[i][j])
-                if self.data[i][j] == 0:
+                if not allow_zero and self.data[i][j] == 0:
                     self.data[i][j] += 1
 
     def gradiant(self):
@@ -54,10 +54,6 @@ class Frame(object):
         nodes = self._distribute_nodes(nodes)
         for i in range(10):
             self.set_color_by_rgb(nodes[i][0], nodes[i][1], nodes[i][2], node=i)
-
-    def set_height(self, color, height):
-        for i in range(height):
-            self.set_color_by_name(color, node=i)
 
     def _distribute_nodes(self, nodes):
         groups = []

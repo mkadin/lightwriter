@@ -35,14 +35,9 @@ class LightWriter(object):
         self.write_frame()
         print "Lights reset"
 
-    def _write(self, data):
-        self.serial.write(data)
-
-    def set_frame(self, frame):
-        self._frame = frame
-
     def write_frame(self, frame=None):
-        self._frame_check(frame)
+        if frame:
+            self._frame = frame
         self.serial.write([255])
         for i in range(10):
             for j in range(4):
@@ -50,32 +45,28 @@ class LightWriter(object):
                     self._frame.data[i][j] = 254
             self.serial.write(self._frame.data[i])
 
-    def _frame_check(self, frame):
-        if not frame and not self._frame:
-            raise AttributeError('Frame required!')
-        if frame:
-            self.set_frame(frame)
-
-    def glow(self, color='green', length=20, period=1, interval=.05, frame=None, **kwargs):
-        self._frame_check(frame)
+    def glow(self, color='green', length=2, period=1, interval=.05, brightness=100, **kwargs):
         steps = int(length / interval)
+        half_max_brightness = brightness / 2
         for i in range(steps):
-            brightness = 50 + 50 * math.cos(period/math.pi * i)
+            brightness = half_max_brightness + half_max_brightness * math.cos(period/math.pi * i)
             self._frame.set_color_by_name(color)
             self._frame.set_brightness(brightness)
             self.write_frame()
             time.sleep(interval)
 
-    def rotate(self, length=20, interval=.05, frame=None, **kwargs):
-        self._frame_check(frame)
+    def rotate(self, length=2, interval=.05, **kwargs):
         steps = int(length / interval)
         for i in range(steps):
             self._frame.shift(1)
             self.write_frame()
             time.sleep(interval)
 
-    def back_and_forth(self, length=20, interval=.05, frame=None, **kwargs):
-        self._frame_check(frame)
+    def back_and_forth(self, color='red', length=2, interval=.1, brightness=100,
+                       background='black', **kwargs):
+        self._frame.set_color_by_name(background)
+        self._frame.set_color_by_name(color, node=9)
+        self._frame.set_brightness(brightness, allow_zero=True)
         steps = int(length / interval)
         stepper = 1
         for i in range(steps):
@@ -86,50 +77,55 @@ class LightWriter(object):
             self.write_frame()
             time.sleep(interval)
 
-    def random(self, length=20, interval=.1, frame=None):
-        self._frame_check(frame)
+    def random(self, length=2, interval=.1, brightness=100, **kwargs):
         steps = int(length / interval)
         for i in range(steps):
             self._frame.random()
+            self._frame.set_brightness(brightness)
             self.write_frame()
             time.sleep(interval)
 
-    def blink(self, color='white', length=5, interval=.3, frame=None):
-        self._frame_check(frame)
+    def blink(self, color='white', length=2, interval=.3, brightness=100, **kwargs):
         steps = int(length / interval / 2)
         for i in range(steps):
             self._frame.set_color_by_name(color)
+            self._frame.set_brightness(brightness)
             self.write_frame()
             time.sleep(interval)
             self._frame.set_color_by_name('black')
             self.write_frame()
             time.sleep(interval)
 
-    def rise_and_fall(self, color='red', height=10, length=5, interval=.3,
-                      background='blue', frame=None):
-        self._frame_check(frame)
+    def rise_and_fall(self, color='red', height=10, length=2, interval=.1,
+                      background='blue', brightness=100, **kwargs):
         stepper = 1
         height_counter = 1
         steps = int(length / interval)
         for i in range(steps):
             self._frame.set_color_by_name(background)
-            self._frame.set_height(color, height_counter)
-            self.write_frame()
+            self._frame.set_brightness(brightness)
+            self.set_height(color=color, height=height_counter, brightness=brightness)
             height_counter += stepper
             if height_counter == height or height_counter == 0:
                 stepper = stepper * -1
 
             time.sleep(interval)
 
-    def clear(self):
+    def clear(self, **kwargs):
         self.write_frame(Frame())
 
-    def wait(self, seconds):
+    def wait(self, seconds=1, **kwargs):
         time.sleep(seconds)
 
-    def frame_method(self, method, write, *args, **kwargs):
-        """Call a frame method on the current frame."""
-        self._frame_check(None)
-        getattr(self._frame, method)(*args, **kwargs)
-        if write:
-            self.write_frame()
+    def set_height(self, color='blue', height=5, brightness=100, **kwargs):
+        for i in range(height):
+            self._frame.set_color_by_name(color, node=i)
+        self._frame.set_brightness(brightness, allow_zero=True)
+        self.write_frame()
+
+    def frame_method(self, frame_method=None, write=True, *args, **kwargs):
+        """Call a method from Frame on the current frame."""
+        if frame_method:
+            getattr(self._frame, frame_method)(*args, **kwargs)
+            if write:
+                self.write_frame()
