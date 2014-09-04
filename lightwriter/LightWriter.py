@@ -118,7 +118,7 @@ class LightWriter(object):
         time.sleep(seconds)
 
     def set_height(self, color='blue', height=5, brightness=100, **kwargs):
-        for i in range(height):
+        for i in range(int(height)):
             self._frame.set_color_by_name(color, node=i)
         self._frame.set_brightness(brightness, allow_zero=True)
         self.write_frame()
